@@ -83,8 +83,8 @@ IsRetirementEligible_Normal <- function(Age, YOS, EntryYear){
 }
 
 IsRetirementEligible_Early <- function(Age, YOS, EntryYear){
-  Check_Early_Tier1 = ifelse((YOS >= 6), TRUE, FALSE)
-  Check_Early_Tier2 = ifelse((YOS >= 8), TRUE, FALSE)
+  Check_Early_Tier1 = ifelse(Age >= 50 & (YOS >= 6), TRUE, FALSE)
+  Check_Early_Tier2 = ifelse(Age >= 55 & (YOS >= 8), TRUE, FALSE)
   
   Check = ifelse(EntryYear >= 2011, Check_Early_Tier2, Check_Early_Tier1)
   return(Check)
@@ -274,16 +274,16 @@ SeparationRates <- SeparationRates %>%
          
          SepRate_Withdrawal_Male = ifelse(YOS < 25, SpecialRisk_Male_Under25,
                                           ifelse(YOS >= 25 & YOS < 29, SpecialRisk_Male_25to29,
-                                                 ifelse(YOS >= 29 & YOS < 34, SpecialRisk_Male_30to34,
-                                                        ifelse(YOS >= 35 & YOS < 44, SpecialRisk_Male_35to44,
-                                                               ifelse(YOS >= 45 & YOS < 54, SpecialRisk_Male_45to54,
+                                                 ifelse(YOS >= 29 & YOS < 35, SpecialRisk_Male_30to34,
+                                                        ifelse(YOS >= 35 & YOS < 45, SpecialRisk_Male_35to44,
+                                                               ifelse(YOS >= 45 & YOS < 55, SpecialRisk_Male_45to54,
                                                                       ifelse(YOS >= 55, SpecialRisk_Male_55, 0)))))),
          
          SepRate_Withdrawal_Female = ifelse(YOS < 25, SpecialRisk_Female_Under25,
                                             ifelse(YOS >= 25 & YOS < 29, SpecialRisk_Female_25to29,
-                                                   ifelse(YOS >= 29 & YOS < 34, SpecialRisk_Female_30to34,
-                                                          ifelse(YOS >= 35 & YOS < 44, SpecialRisk_Female_35to44,
-                                                                 ifelse(YOS >= 45 & YOS < 54, SpecialRisk_Female_45to54,
+                                                   ifelse(YOS >= 29 & YOS < 35, SpecialRisk_Female_30to34,
+                                                          ifelse(YOS >= 35 & YOS < 45, SpecialRisk_Female_35to44,
+                                                                 ifelse(YOS >= 45 & YOS < 55, SpecialRisk_Female_45to54,
                                                                         ifelse(YOS >= 55, SpecialRisk_Female_55, 0)))))),
          
          SepRate_Retire_Male_Tier1 = ifelse(retirement_early == T, SpecialRisk_Tier1_DROP_Male,
@@ -469,8 +469,8 @@ FinalData <- SalaryData %>%
     #                  ifelse(SepType == 'Termination Vested', LumpSumPct*DBEEBalance + (1-LumpSumPct)*Max_PV_DB, DBEEBalance)),
     
     SepType = SeparationType(Age, YOS, EntryYear),
-    LumpSumPct = 0.2,
-    retire_refund_ratio = 0.8,
+    LumpSumPct = 0.5,
+    retire_refund_ratio = 1- LumpSumPct,
     #Term vested DB members are assumed to choose between a refund and deferred benefits based on a retire/refund ratio. This ratio can change for calibration purposes.
     DBWealth = ifelse(SepType == 'Retirement', PV_DB_Benefit, 
                       ifelse(SepType == 'Termination Vested', retire_refund_ratio * PV_DB_Benefit + (1 - retire_refund_ratio) * DBEEBalance, DBEEBalance)),
@@ -491,10 +491,10 @@ FinalData <- SalaryData %>%
     PVFB_DB = PVFB(sep_rate_vec = SepRate_DB, interest = ARR, value_vec = DBWealth),
     #PVFB_CB = PVFB(sep_rate_vec = SepRate_DB, interest = ARR, value_vec = CBWealth),
     PVFS = PVFS(remaining_prob_vec = RemainingProb_DB, interest = ARR, sal_vec = Salary),
-    normal_cost_DB = PVFB_DB[YOS == 0] / PVFS[YOS == 0],
+    normal_cost_DB = ifelse(PVFS[YOS == 0] > 0, PVFB_DB[YOS == 0] / PVFS[YOS == 0], 0),
     #normal_cost_CB = PVFB_CB[YOS == 0] / PVFS[YOS == 0],
     PVFNC_DB = PVFS * normal_cost_DB) %>%
-  # replace(is.na(.), 0) %>%
+  replace(is.na(.), 0) %>%
   ungroup()
 
 
