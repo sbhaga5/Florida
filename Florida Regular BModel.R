@@ -274,16 +274,16 @@ SeparationRates <- SeparationRates %>%
          
          SepRate_Withdrawal_Male = ifelse(YOS < 25, Regular_Male_Under25,
                                           ifelse(YOS >= 25 & YOS < 29, Regular_Male_25to29,
-                                                 ifelse(YOS >= 29 & YOS < 34, Regular_Male_30to34,
-                                                        ifelse(YOS >= 35 & YOS < 44, Regular_Male_35to44,
-                                                               ifelse(YOS >= 45 & YOS < 54, Regular_Male_45to54,
+                                                 ifelse(YOS >= 29 & YOS < 35, Regular_Male_30to34,
+                                                        ifelse(YOS >= 35 & YOS < 45, Regular_Male_35to44,
+                                                               ifelse(YOS >= 45 & YOS < 55, Regular_Male_45to54,
                                                                       ifelse(YOS >= 55, Regular_Male_55, 0)))))),
          
          SepRate_Withdrawal_Female = ifelse(YOS < 25, Regular_Female_Under25,
                                             ifelse(YOS >= 25 & YOS < 29, Regular_Female_25to29,
-                                                   ifelse(YOS >= 29 & YOS < 34, Regular_Female_30to34,
-                                                          ifelse(YOS >= 35 & YOS < 44, Regular_Female_35to44,
-                                                                 ifelse(YOS >= 45 & YOS < 54, Regular_Female_45to54,
+                                                   ifelse(YOS >= 29 & YOS < 35, Regular_Female_30to34,
+                                                          ifelse(YOS >= 35 & YOS < 45, Regular_Female_35to44,
+                                                                 ifelse(YOS >= 45 & YOS < 55, Regular_Female_45to54,
                                                                         ifelse(YOS >= 55, Regular_Female_55, 0)))))),
          
          SepRate_Retire_Male_Tier1 = ifelse(retirement_early == T, Regular_K12_Tier1_DROP_Male + Regular_NonK12_Tier1_DROP_Male,
